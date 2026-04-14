@@ -1,0 +1,25 @@
+{
+  "cookies": [
+    {
+      "name": "XSRF-TOKEN",
+      "value": "eyJpdiI6Ik4zek00MHhxRHpqU1Rzd29md1NOcFE9PSIsInZhbHVlIjoiZGRoL2RUYVl0NlVBZm1UK01xWWw4cCt6UmsxeTM5SVUyWUtEOThKd05qd05FL2VRLzhNUzdFTm1qalMwUTE3aHRuYzZQVnFaVmJpZE5SRU0wc3k0eDk5RWpzQUxRTHRKdXl3dmRIaXJldzRUdmN0S21udVZNdzAxQXVtMXhadWwiLCJtYWMiOiJhNDhkYWJkNTMwNzlhNDc4MjgwNTRiZGE4NTdkZmIzMThjNGViOWU4NTZmYjA5YTE0ZDIyYWQ1MGNmYWMyZDk1IiwidGFnIjoiIn0%3D",
+      "domain": "127.0.0.1",
+      "path": "/",
+      "expires": 1776154127.123857,
+      "httpOnly": false,
+      "secure": false,
+      "sameSite": "Lax"
+    },
+    {
+      "name": "sistem_monitoring_santri_ibs_ash_shiddiiqi_session",
+      "value": "eyJpdiI6IjIrcWtTVE5KUnZNR3Z4Ny9JSm9SSmc9PSIsInZhbHVlIjoiR3dWNjVSaHU3YWhyNVYzNFZsOWpYdGg3bjFaR1lLWTVpanlwd2pVa1JNZUhFN3VZdEFjdmdIZUpucUlhU09rblhOcmZKK0NnTlZod0JOdml1Y1RHcWJTZjdaZ2MzVTZvbkhCNDQrSUNYV1pWRTRjR2ozMmxhWDBYa0RFU3J1MFEiLCJtYWMiOiI5YjFhMjQwNmJiYWUwMTk4MGMwYjMyMmNiZjU2ODdjMmFkMDQ4NmJiMjU1OWRlMmIwODg4MDg2MjUyMjYxNGJiIiwidGFnIjoiIn0%3D",
+      "domain": "127.0.0.1",
+      "path": "/",
+      "expires": 1776154127.123911,
+      "httpOnly": true,
+      "secure": false,
+      "sameSite": "Lax"
+    }
+  ],
+  "origins": []
+}
