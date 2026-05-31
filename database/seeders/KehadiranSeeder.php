@@ -28,9 +28,9 @@ class KehadiranSeeder extends Seeder
 
                 Kehadiran::updateOrCreate(
                     [
-                        'santri_id' => $santriId,
-                        'tanggal'   => $tanggal,
-                        'sesi'      => 'pagi',
+                        'santri_id'         => $santriId,
+                        'tanggal'           => $tanggal,
+                        'sesi_kehadiran_id' => 1, // 1 = pagi
                     ],
                     [
                         'ustadz_id'  => $ustadzId,

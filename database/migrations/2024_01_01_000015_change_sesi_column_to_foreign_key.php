@@ -47,8 +47,8 @@ return new class extends Migration
                 ->update(['sesi_kehadiran_id' => $newId]);
         }
 
-        // 4) Drop old unique constraint and sesi column, create new unique
         Schema::table('kehadiran', function (Blueprint $table) {
+            $table->dropForeign(['santri_id']);
             $table->dropUnique('unique_absensi');
         });
 
@@ -58,6 +58,7 @@ return new class extends Migration
 
         Schema::table('kehadiran', function (Blueprint $table) {
             $table->unique(['santri_id', 'tanggal', 'sesi_kehadiran_id'], 'unique_absensi_v2');
+            $table->foreign('santri_id')->references('id')->on('santri')->cascadeOnDelete();
         });
     }
 
