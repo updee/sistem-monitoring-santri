@@ -84,7 +84,7 @@
             <div class="card-header-custom"><div class="card-title-custom">Setoran Hafalan Terbaru</div></div>
             <div class="table-responsive">
                 <table class="table-custom">
-                    <thead><tr><th>Surat</th><th>Hal.</th><th>Nilai</th><th>Grade</th><th>Jenis</th><th>Tanggal</th></tr></thead>
+                    <thead><tr><th>Surat</th><th>Hal.</th><th>Nilai</th><th>Grade</th><th>Kategori</th><th>Jenis</th><th>Tanggal</th></tr></thead>
                     <tbody>
                         @forelse($santri->hafalan->take(5) as $hf)
                             <tr>
@@ -92,11 +92,12 @@
                                 <td style="font-size:12px;">{{ $hf->jumlah_halaman }}</td>
                                 <td style="font-weight:700;">{{ $hf->nilai?number_format($hf->nilai,1):'-' }}</td>
                                 <td>@if($hf->grade)<span class="badge-custom grade-{{ strtolower($hf->grade) }}">{{ $hf->grade }}</span>@else<span style="color:var(--txt3);">-</span>@endif</td>
+                                <td>@if($hf->kategori)<span class="badge-custom {{ $hf->kategori_badge_color }}" style="font-size:10px;">{{ $hf->kategori_label }}</span>@else<span style="color:var(--txt3);">-</span>@endif</td>
                                 <td><span class="badge-custom {{ $hf->jenis==='setoran_baru'?'badge-green':'badge-blue' }}" style="font-size:10px;">{{ $hf->jenis_label }}</span></td>
                                 <td style="font-size:12px;">{{ $hf->tanggal_setoran->format('d M Y') }}</td>
                             </tr>
                         @empty
-                            <tr><td colspan="6" class="text-center py-3" style="color:var(--txt3);">Belum ada data hafalan</td></tr>
+                            <tr><td colspan="7" class="text-center py-3" style="color:var(--txt3);">Belum ada data hafalan</td></tr>
                         @endforelse
                     </tbody>
                 </table>

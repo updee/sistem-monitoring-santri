@@ -9,7 +9,31 @@
         <div class="page-header-title">Laporan Pencapaian</div>
         <div class="page-header-sub">Rekap pencapaian santri</div>
     </div>
-    <a class="btn-outline-hijau" href="{{ route('admin.laporan.export.santri') }}">Export Santri CSV</a>
+    <div class="d-flex gap-2">
+        <a class="btn-outline-hijau" href="{{ route('admin.laporan.export.pencapaian', request()->query()) }}">Export CSV</a>
+    </div>
+</div>
+
+<div class="card-custom mb-3">
+    <div class="card-body-custom" style="padding:12px 18px;">
+        <form method="GET" action="{{ route('admin.laporan.pencapaian') }}" class="d-flex gap-2 align-items-center flex-wrap">
+            <select name="bulan" class="form-control-custom" style="width:130px; font-size:12px; padding:6px 12px; height:auto;">
+                <option value="">Semua Bulan</option>
+                @for($m=1;$m<=12;$m++)
+                    <option value="{{ $m }}" {{ request('bulan') == $m ? 'selected':'' }}>
+                        {{ \Carbon\Carbon::create(null,$m)->locale('id')->isoFormat('MMMM') }}
+                    </option>
+                @endfor
+            </select>
+            <select name="tahun" class="form-control-custom" style="width:100px; font-size:12px; padding:6px 12px; height:auto;">
+                <option value="">Semua Tahun</option>
+                @for($y=now()->year;$y>=2023;$y--)
+                    <option value="{{ $y }}" {{ request('tahun') == $y ? 'selected':'' }}>{{ $y }}</option>
+                @endfor
+            </select>
+            <button type="submit" class="btn-hijau" style="padding:6px 14px; font-size:12px;">Filter</button>
+        </form>
+    </div>
 </div>
 
 <div class="card-custom">

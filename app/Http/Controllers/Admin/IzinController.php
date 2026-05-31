@@ -11,14 +11,27 @@ class IzinController extends Controller
     public function index()
     {
         $status = request('status', 'semua');
+        $bulan  = request('bulan');
+        $tahun  = request('tahun');
+
         $query = Izin::with(['santri.kelas', 'pengaju', 'approver'])->latest();
+        
         if (in_array($status, ['menunggu', 'disetujui', 'ditolak'], true)) {
             $query->where('status', $status);
         }
+
+        if ($bulan) {
+            $query->whereMonth('tanggal_mulai', (int) $bulan);
+        }
+        
+        if ($tahun) {
+            $query->whereYear('tanggal_mulai', (int) $tahun);
+        }
+
         $izinList = $query->paginate(15)->withQueryString();
         $jumlahMenunggu = Izin::where('status', 'menunggu')->count();
 
-        return view('admin.izin.index', compact('izinList', 'jumlahMenunggu', 'status'));
+        return view('admin.izin.index', compact('izinList', 'jumlahMenunggu', 'status', 'bulan', 'tahun'));
     }
 
     public function show(Izin $izin)

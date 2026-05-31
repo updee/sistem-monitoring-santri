@@ -13,7 +13,7 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-        $santri = Santri::with(['kelas', 'kamar'])
+        $santri = Santri::with(['kelas', 'kamar', 'suratPanggilan'])
             ->where('wali_id', $user->id)
             ->first();
 

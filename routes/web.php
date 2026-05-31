@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\KelasController;
 use App\Http\Controllers\Admin\KamarController;
 use App\Http\Controllers\Admin\KategoriPelanggaranController;
+use App\Http\Controllers\Admin\SesiKehadiranController;
 use App\Http\Controllers\Admin\IzinController as AdminIzinController;
 use App\Http\Controllers\Admin\LaporanController;
 
@@ -78,6 +79,8 @@ Route::middleware(['auth', 'role:admin'])
     Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('dashboard');
 
     // Santri
+    Route::get('santri/import/template', [SantriController::class, 'downloadTemplate'])->name('santri.import.template');
+    Route::post('santri/import', [SantriController::class, 'import'])->name('santri.import');
     Route::resource('santri', SantriController::class);
     Route::get('santri/{santri}/rekap', [SantriController::class, 'rekap'])->name('santri.rekap');
 
@@ -89,6 +92,7 @@ Route::middleware(['auth', 'role:admin'])
     Route::resource('kelas',  KelasController::class);
     Route::resource('kamar',  KamarController::class);
     Route::resource('kategori-pelanggaran', KategoriPelanggaranController::class);
+    Route::resource('sesi-kehadiran', SesiKehadiranController::class)->except(['show']);
 
     // Izin
     Route::get('izin',                  [AdminIzinController::class, 'index'])->name('izin.index');
@@ -103,12 +107,17 @@ Route::middleware(['auth', 'role:admin'])
         Route::get('kehadiran',   [LaporanController::class, 'kehadiran'])->name('kehadiran');
         Route::get('pelanggaran', [LaporanController::class, 'pelanggaran'])->name('pelanggaran');
         Route::get('pencapaian',  [LaporanController::class, 'pencapaian'])->name('pencapaian');
+        Route::get('izin',        [LaporanController::class, 'izin'])->name('izin');
 
         Route::get('export/santri',      [LaporanController::class, 'exportSantri'])->name('export.santri');
         Route::get('export/hafalan',     [LaporanController::class, 'exportHafalan'])->name('export.hafalan');
         Route::get('export/kehadiran',   [LaporanController::class, 'exportKehadiran'])->name('export.kehadiran');
         Route::get('export/pelanggaran', [LaporanController::class, 'exportPelanggaran'])->name('export.pelanggaran');
+        Route::get('export/pencapaian',  [LaporanController::class, 'exportPencapaian'])->name('export.pencapaian');
+        Route::get('export/izin',        [LaporanController::class, 'exportIzin'])->name('export.izin');
     });
+
+    Route::get('pelanggaran/print-sp/{suratPanggilan}', [LaporanController::class, 'printSp'])->name('pelanggaran.print-sp');
 });
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -135,6 +144,7 @@ Route::middleware(['auth', 'role:ustadz'])
 
     // Pelanggaran
     Route::resource('pelanggaran', PelanggaranController::class);
+    Route::get('pelanggaran/print-sp/{suratPanggilan}', [PelanggaranController::class, 'printSp'])->name('pelanggaran.print-sp');
 
     // Pencapaian
     Route::resource('pencapaian', PencapaianController::class);

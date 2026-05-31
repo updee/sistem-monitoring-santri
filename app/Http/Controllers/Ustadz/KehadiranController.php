@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Kehadiran;
 use App\Models\Santri;
 use App\Models\Kelas;
+use App\Models\SesiKehadiran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -62,7 +63,7 @@ class KehadiranController extends Controller
     public function input(Request $request)
     {
         $tanggal   = $request->get('tanggal', Carbon::today()->toDateString());
-        $sesi      = $request->get('sesi', 'pagi');
+        $sesiId    = $request->get('sesi_kehadiran_id');
         $kelasId   = $request->get('kelas_id');
         $kelasList = Kelas::where('is_active', true)
             ->where(function ($q) {
@@ -72,6 +73,14 @@ class KehadiranController extends Controller
             ->orderBy('nama_kelas')
             ->get();
 
+        // Ambil sesi dari database (master data admin)
+        $sesiList = SesiKehadiran::aktif()->get();
+
+        // Default sesi to first available if none selected
+        if (!$sesiId && $sesiList->isNotEmpty()) {
+            $sesiId = $sesiList->first()->id;
+        }
+
         $santriList = collect();
         if ($kelasId) {
             $this->authorizeKelasForUstadz((int) $kelasId);
@@ -79,10 +88,10 @@ class KehadiranController extends Controller
                 ->where('kelas_id', $kelasId)
                 ->orderBy('nama')
                 ->get()
-                ->map(function ($santri) use ($tanggal, $sesi) {
+                ->map(function ($santri) use ($tanggal, $sesiId) {
                     $existing = Kehadiran::where('santri_id', $santri->id)
                         ->where('tanggal', $tanggal)
-                        ->where('sesi', $sesi)
+                        ->where('sesi_kehadiran_id', $sesiId)
                         ->first();
                     $santri->status_absen = $existing?->status ?? 'hadir';
                     $santri->keterangan   = $existing?->keterangan ?? '';
@@ -92,7 +101,7 @@ class KehadiranController extends Controller
         }
 
         return view('ustadz.kehadiran.input', compact(
-            'tanggal', 'sesi', 'kelasId', 'kelasList', 'santriList'
+            'tanggal', 'sesiId', 'kelasId', 'kelasList', 'santriList', 'sesiList'
         ));
     }
 
@@ -100,11 +109,11 @@ class KehadiranController extends Controller
     public function storeBulk(Request $request)
     {
         $request->validate([
-            'tanggal'          => ['required', 'date', 'before_or_equal:today'],
-            'sesi'             => ['required', 'in:pagi,siang,malam'],
-            'kelas_id'         => ['required', 'exists:kelas,id'],
-            'absensi'          => ['required', 'array'],
-            'absensi.*.status' => ['required', 'in:hadir,izin,sakit,alpha'],
+            'tanggal'             => ['required', 'date', 'before_or_equal:today'],
+            'sesi_kehadiran_id'   => ['required', 'exists:sesi_kehadiran,id'],
+            'kelas_id'            => ['required', 'exists:kelas,id'],
+            'absensi'             => ['required', 'array'],
+            'absensi.*.status'    => ['required', 'in:hadir,izin,sakit,alpha'],
         ]);
 
         $kelasId = (int) $request->kelas_id;
@@ -129,16 +138,16 @@ class KehadiranController extends Controller
         }
 
         $tanggal   = $request->tanggal;
-        $sesi      = $request->sesi;
+        $sesiId    = $request->sesi_kehadiran_id;
         $ustadzId  = Auth::id();
 
-        DB::transaction(function () use ($request, $tanggal, $sesi, $ustadzId) {
+        DB::transaction(function () use ($request, $tanggal, $sesiId, $ustadzId) {
             foreach ($request->absensi as $santriId => $data) {
                 Kehadiran::updateOrCreate(
                     [
-                        'santri_id' => $santriId,
-                        'tanggal'   => $tanggal,
-                        'sesi'      => $sesi,
+                        'santri_id'         => $santriId,
+                        'tanggal'           => $tanggal,
+                        'sesi_kehadiran_id' => $sesiId,
                     ],
                     [
                         'ustadz_id'  => $ustadzId,
@@ -150,9 +159,9 @@ class KehadiranController extends Controller
         });
 
         return redirect()->route('ustadz.kehadiran.input', [
-                'tanggal'  => $tanggal,
-                'sesi'     => $sesi,
-                'kelas_id' => $request->kelas_id,
+                'tanggal'           => $tanggal,
+                'sesi_kehadiran_id' => $sesiId,
+                'kelas_id'          => $request->kelas_id,
             ])
             ->with('success', 'Absensi berhasil disimpan untuk ' . count($request->absensi) . ' santri.');
     }

@@ -32,11 +32,21 @@
     <div class="card-body-custom">
         <form method="GET">
             <div class="row g-3 align-items-end">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label class="form-label-custom">Cari Santri</label>
                     <input type="text" name="search" class="form-control-custom" placeholder="Nama santri..." value="{{ request('search') }}">
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
+                    <label class="form-label-custom">Kategori</label>
+                    <select name="kategori" class="form-control-custom">
+                        <option value="">Semua</option>
+                        <option value="wisuda" {{ request('kategori') === 'wisuda' ? 'selected' : '' }}>🎓 Wisuda</option>
+                        <option value="zaidah" {{ request('kategori') === 'zaidah' ? 'selected' : '' }}>📖 Zaidah</option>
+                        <option value="ujian"  {{ request('kategori') === 'ujian'  ? 'selected' : '' }}>📝 Ujian</option>
+                        <option value="harian" {{ request('kategori') === 'harian' ? 'selected' : '' }}>📅 Harian</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
                     <label class="form-label-custom">Jenis Setoran</label>
                     <select name="jenis" class="form-control-custom">
                         <option value="">Semua Jenis</option>
@@ -74,6 +84,7 @@
                     <th>Halaman</th>
                     <th>Nilai</th>
                     <th>Grade</th>
+                    <th>Kategori</th>
                     <th>Jenis</th>
                     <th>Tanggal</th>
                     <th>Aksi</th>
@@ -113,6 +124,13 @@
                             @endif
                         </td>
                         <td>
+                            @if($hf->kategori)
+                                <span class="badge-custom {{ $hf->kategori_badge_color }}">{{ $hf->kategori_label }}</span>
+                            @else
+                                <span style="color:var(--txt3);font-size:11px;">-</span>
+                            @endif
+                        </td>
+                        <td>
                             <span class="badge-custom {{ $hf->jenis === 'setoran_baru' ? 'badge-green' : 'badge-blue' }}">
                                 {{ $hf->jenis_label }}
                             </span>
@@ -122,6 +140,7 @@
                         </td>
                         <td>
                             <div class="d-flex gap-1">
+                                <a href="{{ route('ustadz.hafalan.show', $hf) }}" class="btn-view-custom">Detail</a>
                                 <a href="{{ route('ustadz.hafalan.edit', $hf) }}" class="btn-edit-custom">Edit</a>
                                 <form method="POST" action="{{ route('ustadz.hafalan.destroy', $hf) }}"
                                     onsubmit="return confirm('Hapus data setoran ini?')">
@@ -133,7 +152,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="9" class="text-center py-5" style="color:var(--txt3);">
+                        <td colspan="10" class="text-center py-5" style="color:var(--txt3);">
                             Belum ada data hafalan. <a href="{{ route('ustadz.hafalan.create') }}" style="color:var(--hijau);font-weight:600;">Catat sekarang →</a>
                         </td>
                     </tr>
@@ -150,7 +169,12 @@
                         <div class="td-name-main">{{ $hf->santri->nama }}</div>
                         <div class="td-name-sub">{{ $hf->tanggal_setoran->format('d M Y') }}</div>
                     </div>
-                    <span class="badge-custom {{ $hf->jenis === 'setoran_baru' ? 'badge-green' : 'badge-blue' }} ms-auto">{{ $hf->jenis_label }}</span>
+                    <div class="ms-auto d-flex gap-1">
+                        @if($hf->kategori)
+                            <span class="badge-custom {{ $hf->kategori_badge_color }}">{{ $hf->kategori_label }}</span>
+                        @endif
+                        <span class="badge-custom {{ $hf->jenis === 'setoran_baru' ? 'badge-green' : 'badge-blue' }}">{{ $hf->jenis_label }}</span>
+                    </div>
                 </div>
                 <div class="td-name-sub mb-2">{{ $hf->nama_surat }} · Juz {{ $hf->nomor_juz ?? '-' }} · {{ $hf->jumlah_halaman }} hal</div>
                 <div class="d-flex align-items-center justify-content-between mb-2">
@@ -158,6 +182,7 @@
                     @if($hf->grade)<span class="badge-custom grade-{{ strtolower($hf->grade) }}">{{ $hf->grade }}</span>@endif
                 </div>
                 <div class="d-flex gap-1">
+                    <a href="{{ route('ustadz.hafalan.show', $hf) }}" class="btn-view-custom">Detail</a>
                     <a href="{{ route('ustadz.hafalan.edit', $hf) }}" class="btn-edit-custom">Edit</a>
                     <form method="POST" action="{{ route('ustadz.hafalan.destroy', $hf) }}" onsubmit="return confirm('Hapus data setoran ini?')">
                         @csrf @method('DELETE')
@@ -169,6 +194,7 @@
             <div class="text-center py-3" style="color:var(--txt3);">Belum ada data hafalan</div>
         @endforelse
     </div>
+    @if($hafalan->total() > 0)
     <div class="pagination-custom">
         <div class="pagination-info">{{ $hafalan->firstItem() }}–{{ $hafalan->lastItem() }} dari {{ $hafalan->total() }} setoran</div>
         <div class="d-flex gap-1">
@@ -177,11 +203,6 @@
             @endforeach
         </div>
     </div>
+    @endif
 </div>
 @endsection
-
-
-{{-- ════════════════════════════════════════════════════════════
-     resources/views/ustadz/hafalan/create.blade.php
-     ════════════════════════════════════════════════════════════ --}}
-{{-- (Save as separate file: ustadz/hafalan/create.blade.php) --}}

@@ -67,10 +67,10 @@
                 </div>
                 <div class="col-md-2">
                     <label class="form-label-custom">Sesi</label>
-                    <select name="sesi" class="form-control-custom" onchange="this.form.submit()">
-                        <option value="pagi"  {{ $sesi === 'pagi'  ? 'selected' : '' }}>Pagi</option>
-                        <option value="siang" {{ $sesi === 'siang' ? 'selected' : '' }}>Siang</option>
-                        <option value="malam" {{ $sesi === 'malam' ? 'selected' : '' }}>Malam</option>
+                    <select name="sesi_kehadiran_id" class="form-control-custom" onchange="this.form.submit()">
+                        @foreach($sesiList as $sesi)
+                            <option value="{{ $sesi->id }}" {{ $sesiId == $sesi->id ? 'selected' : '' }}>{{ $sesi->nama_sesi }}</option>
+                        @endforeach
                     </select>
                 </div>
                 <div class="col-md-3">
@@ -92,16 +92,16 @@
 @if($santriList->isNotEmpty())
     <form method="POST" action="{{ route('ustadz.kehadiran.store-bulk') }}">
         @csrf
-        <input type="hidden" name="tanggal"  value="{{ $tanggal }}">
-        <input type="hidden" name="sesi"     value="{{ $sesi }}">
-        <input type="hidden" name="kelas_id" value="{{ $kelasId }}">
+        <input type="hidden" name="tanggal"           value="{{ $tanggal }}">
+        <input type="hidden" name="sesi_kehadiran_id"  value="{{ $sesiId }}">
+        <input type="hidden" name="kelas_id"            value="{{ $kelasId }}">
 
         <div class="card-custom mb-4">
             {{-- Quick Actions --}}
             <div class="card-header-custom">
                 <div class="card-title-custom">
                     Absensi {{ \Carbon\Carbon::parse($tanggal)->locale('id')->isoFormat('dddd, D MMMM Y') }}
-                    — Sesi {{ ucfirst($sesi) }}
+                    — Sesi {{ $sesiList->firstWhere('id', $sesiId)?->nama_sesi ?? '-' }}
                 </div>
                 <div class="d-flex gap-2">
                     <button type="button" class="btn-outline-hijau" style="padding:5px 12px;font-size:11px;" onclick="setAllStatus('hadir')">

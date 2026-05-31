@@ -58,9 +58,15 @@
             </div>
         </div>
     </div>
-    @if($totalPoin >= 75)
+    @if($santri->active_sp)
         <div class="col-md-8">
-            <div class="alert-danger" style="border-radius:10px;padding:14px 18px;font-size:13px;">
+            <div class="alert-danger" style="border-radius:10px;padding:14px 18px;font-size:13px;border-left:4px solid #c62828;">
+                <strong>Perhatian: {{ strtoupper($santri->active_sp->jenis_sp) }} Aktif!</strong> Akumulasi poin pelanggaran telah mencapai {{ $santri->active_sp->total_poin }} poin. Mohon segera menghubungi pihak pesantren untuk pembinaan lebih lanjut.
+            </div>
+        </div>
+    @elseif($totalPoin >= 75)
+        <div class="col-md-8">
+            <div class="alert-danger" style="border-radius:10px;padding:14px 18px;font-size:13px;border-left:4px solid #c62828;">
                 <strong>Perhatian!</strong> Akumulasi poin pelanggaran telah mencapai {{ $totalPoin }} poin. Mohon segera menghubungi pihak pesantren untuk pembinaan lebih lanjut.
             </div>
         </div>

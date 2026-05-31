@@ -141,32 +141,11 @@ test.describe('C. USTADZ', () => {
       if (resp?.status() === 200 && !page.url().includes('/login')) {
         await expect(page).toHaveURL(/\/ustadz\/pelanggaran\/create/);
 
-        // Santri uses autocomplete datalist, need to fill hidden input + text field
-        const santriAutocomplete = page.locator('#santriAutocomplete');
-        const firstOption = page.locator('#santriOptions option').first();
-        const optionValue = await firstOption.getAttribute('value');
-        const optionId = await firstOption.getAttribute('data-id');
+        // Fill Form
+        await page.locator('select[name="santri_id"]').selectOption({ index: 1 });
+        await page.locator('select[name="kategori_id"]').selectOption({ index: 1 });
+        await page.locator('input[name="jenis_pelanggaran"]').fill('Terlambat masuk kelas');
         
-        if (optionValue && optionId) {
-          await page.locator('#santriIdInput').evaluate((el, id) => {
-            (el as HTMLInputElement).value = id;
-          }, optionId);
-          await santriAutocomplete.fill(optionValue);
-          await santriAutocomplete.dispatchEvent('change');
-        }
-
-        // Select jenis pelanggaran (first real option)
-        await page.locator('select[name="jenis_pelanggaran"]').selectOption({ index: 1 });
-        // Trigger JS to auto-set kategori_poin
-        await page.locator('select[name="jenis_pelanggaran"]').dispatchEvent('change');
-        await page.waitForTimeout(200);
-
-        // Set kategori_poin if not auto-filled
-        const kategoriVal = await page.locator('select[name="kategori_poin"]').inputValue();
-        if (!kategoriVal) {
-          await page.locator('select[name="kategori_poin"]').selectOption({ index: 1 });
-        }
-
         await page.locator('input[name="tanggal"]').fill(today());
         await page.locator('select[name="status_tindak_lanjut"]').selectOption('belum');
 
@@ -185,21 +164,10 @@ test.describe('C. USTADZ', () => {
       const resp = await page.goto('/ustadz/pelanggaran/create');
       
       if (resp?.status() === 200 && !page.url().includes('/login')) {
-        // Fill santri via hidden input
-        const firstOption = page.locator('#santriOptions option').first();
-        const optionValue = await firstOption.getAttribute('value');
-        const optionId = await firstOption.getAttribute('data-id');
+        await page.locator('select[name="santri_id"]').selectOption({ index: 1 });
+        await page.locator('select[name="kategori_id"]').selectOption({ index: 1 });
         
-        if (optionValue && optionId) {
-          await page.locator('#santriIdInput').evaluate((el, id) => {
-            (el as HTMLInputElement).value = id;
-          }, optionId);
-          await page.locator('#santriAutocomplete').fill(optionValue);
-          await page.locator('#santriAutocomplete').dispatchEvent('change');
-        }
-
-        // Leave jenis_pelanggaran as empty (first option is placeholder)
-        await page.locator('select[name="kategori_poin"]').selectOption({ index: 1 });
+        // Leave jenis_pelanggaran as empty
         await page.locator('input[name="tanggal"]').fill(today());
         await page.locator('select[name="status_tindak_lanjut"]').selectOption('belum');
 

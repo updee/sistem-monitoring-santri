@@ -54,7 +54,17 @@ class Santri extends Model
             : null;
     }
 
+    public function getActiveSpAttribute()
+    {
+        return $this->suratPanggilan()->where('status', 'dikirim')->latest('tanggal_terbit')->first();
+    }
+
     // ── Relationships ────────────────────────────────────────────────────────
+    public function suratPanggilan()
+    {
+        return $this->hasMany(SuratPanggilan::class, 'santri_id');
+    }
+
     public function kelas()
     {
         return $this->belongsTo(Kelas::class, 'kelas_id');

@@ -92,8 +92,15 @@
                         <td style="font-size:15px;font-weight:800;color:var(--emas-dark);">
                             {{ $p->poin_sanksi }}
                         </td>
-                        <td style="font-size:13px;font-weight:700;color:{{ $p->santri->total_poin_pelanggaran >= 75 ? '#c62828' : 'var(--txt)' }}">
-                            {{ $p->santri->total_poin_pelanggaran }}
+                        <td style="font-size:13px;font-weight:700;">
+                            @php
+                                $totalPoin = $p->santri->total_poin_pelanggaran ?? 0;
+                                $activeSp = $p->santri->active_sp;
+                            @endphp
+                            <div style="color:{{ $totalPoin >= 75 ? '#c62828' : 'var(--txt)' }}">{{ $totalPoin }}</div>
+                            @if($activeSp)
+                                <span class="badge-custom badge-red mt-1" style="font-size:10px;">{{ $activeSp->jenis_sp }}</span>
+                            @endif
                         </td>
                         <td style="font-size:12px;color:var(--txt2);">{{ $p->tanggal->format('d M Y') }}</td>
                         <td>
@@ -102,13 +109,16 @@
                             </span>
                         </td>
                         <td>
-                            <div class="d-flex gap-1">
+                            <div class="d-flex gap-1 flex-wrap">
                                 <a href="{{ route('ustadz.pelanggaran.edit', $p) }}" class="btn-edit-custom">Edit</a>
                                 <form method="POST" action="{{ route('ustadz.pelanggaran.destroy', $p) }}"
                                     onsubmit="return confirm('Hapus catatan pelanggaran ini?')">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="btn-danger-custom">Hapus</button>
                                 </form>
+                                @if($activeSp)
+                                    <a href="{{ route('ustadz.pelanggaran.print-sp', $activeSp->id) }}" target="_blank" class="btn-view-custom mt-1" style="width:100%;text-align:center;">Cetak {{ $activeSp->jenis_sp }}</a>
+                                @endif
                             </div>
                         </td>
                     </tr>

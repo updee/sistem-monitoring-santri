@@ -17,6 +17,44 @@ class Pelanggaran extends Model
     ];
     protected $casts = ['tanggal' => 'date'];
 
+    protected static function booted(): void
+    {
+        static::created(function (self $model) {
+            $model->checkAndCreateSp();
+        });
+    }
+
+    public function checkAndCreateSp(): void
+    {
+        $totalPoin = self::where('santri_id', $this->santri_id)->sum('poin_sanksi');
+
+        if ($totalPoin >= 100) {
+            $this->createSpIfNotExists('SP 3', $totalPoin);
+        } elseif ($totalPoin >= 75) {
+            $this->createSpIfNotExists('SP 2', $totalPoin);
+        } elseif ($totalPoin >= 50) {
+            $this->createSpIfNotExists('SP 1', $totalPoin);
+        }
+    }
+
+    private function createSpIfNotExists($jenisSp, $totalPoin)
+    {
+        $exists = SuratPanggilan::where('santri_id', $this->santri_id)
+            ->where('jenis_sp', $jenisSp)
+            ->exists();
+
+        if (!$exists) {
+            SuratPanggilan::create([
+                'santri_id'      => $this->santri_id,
+                'jenis_sp'       => $jenisSp,
+                'total_poin'     => $totalPoin,
+                'tanggal_terbit' => now(),
+                'status'         => 'dikirim',
+                'catatan_ustadz' => "Otomatis diterbitkan sistem karena akumulasi poin mencapai {$totalPoin}."
+            ]);
+        }
+    }
+
     public function santri()
     {
         return $this->belongsTo(Santri::class, 'santri_id');

@@ -8,6 +8,8 @@ use App\Models\Kehadiran;
 use App\Models\Pelanggaran;
 use App\Models\Pencapaian;
 use App\Models\Santri;
+use App\Models\Izin;
+use App\Models\SuratPanggilan;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -23,6 +25,7 @@ class LaporanController extends Controller
         $data = Hafalan::with(['santri', 'ustadz'])
             ->when($request->filled('bulan'), fn($q) => $q->whereMonth('tanggal_setoran', (int)$request->bulan))
             ->when($request->filled('tahun'), fn($q) => $q->whereYear('tanggal_setoran', (int)$request->tahun))
+            ->when($request->filled('kategori'), fn($q) => $q->where('kategori', $request->kategori))
             ->latest('tanggal_setoran')
             ->paginate(20)
             ->withQueryString();
@@ -79,6 +82,17 @@ class LaporanController extends Controller
         return view('admin.laporan.pencapaian', compact('data'));
     }
 
+    public function izin(Request $request)
+    {
+        $data = Izin::with(['santri', 'pengaju', 'approver'])
+            ->when($request->filled('bulan'), fn($q) => $q->whereMonth('tanggal_mulai', (int)$request->bulan))
+            ->when($request->filled('tahun'), fn($q) => $q->whereYear('tanggal_mulai', (int)$request->tahun))
+            ->latest('tanggal_mulai')
+            ->paginate(20)
+            ->withQueryString();
+        return view('admin.laporan.izin', compact('data'));
+    }
+
     public function exportSantri(): StreamedResponse
     {
         $rows = Santri::with(['kelas', 'kamar'])->orderBy('nama')->get();
@@ -89,9 +103,10 @@ class LaporanController extends Controller
     public function exportHafalan(): StreamedResponse
     {
         $rows = Hafalan::with('santri')->latest('tanggal_setoran')->get();
-        return $this->csvResponse('laporan_hafalan.csv', ['Tanggal', 'Santri', 'Surat', 'Juz', 'Halaman', 'Nilai', 'Grade'], $rows->map(fn($r) => [
+        return $this->csvResponse('laporan_hafalan.csv', ['Tanggal', 'Santri', 'Surat', 'Juz', 'Halaman', 'Kategori', 'Jenis', 'Nilai', 'Grade'], $rows->map(fn($r) => [
             optional($r->tanggal_setoran)->format('Y-m-d'),
-            $r->santri?->nama, $r->nama_surat, $r->nomor_juz, $r->jumlah_halaman, $r->nilai, $r->grade,
+            $r->santri?->nama, $r->nama_surat, $r->nomor_juz, $r->jumlah_halaman,
+            $r->kategori_label, $r->jenis_label, $r->nilai, $r->grade,
         ])->toArray());
     }
     public function exportKehadiran(): StreamedResponse
@@ -109,6 +124,30 @@ class LaporanController extends Controller
         ])->toArray());
     }
 
+    public function exportPencapaian(Request $request): StreamedResponse
+    {
+        $rows = Pencapaian::with('santri')
+            ->when($request->filled('bulan'), fn($q) => $q->whereMonth('tanggal', (int)$request->bulan))
+            ->when($request->filled('tahun'), fn($q) => $q->whereYear('tanggal', (int)$request->tahun))
+            ->latest('tanggal')->get();
+
+        return $this->csvResponse('laporan_pencapaian.csv', ['Tanggal', 'Santri', 'Judul Pencapaian', 'Tingkat', 'Peringkat'], $rows->map(fn($r) => [
+            optional($r->tanggal)->format('Y-m-d'), $r->santri?->nama, $r->judul_pencapaian, $r->tingkat_label, $r->peringkat_label,
+        ])->toArray());
+    }
+
+    public function exportIzin(Request $request): StreamedResponse
+    {
+        $rows = Izin::with('santri')
+            ->when($request->filled('bulan'), fn($q) => $q->whereMonth('tanggal_mulai', (int)$request->bulan))
+            ->when($request->filled('tahun'), fn($q) => $q->whereYear('tanggal_mulai', (int)$request->tahun))
+            ->latest('tanggal_mulai')->get();
+
+        return $this->csvResponse('laporan_izin.csv', ['Tanggal Mulai', 'Tanggal Kembali', 'Santri', 'Alasan', 'Status', 'Catatan Admin'], $rows->map(fn($r) => [
+            optional($r->tanggal_mulai)->format('Y-m-d'), optional($r->tanggal_kembali)->format('Y-m-d'), $r->santri?->nama, $r->alasan, $r->status_label, $r->catatan_admin,
+        ])->toArray());
+    }
+
     private function csvResponse(string $filename, array $header, array $rows): StreamedResponse
     {
         return response()->streamDownload(function () use ($header, $rows) {
@@ -122,5 +161,10 @@ class LaporanController extends Controller
             'Content-Type' => 'text/csv; charset=UTF-8',
         ]);
     }
-}
 
+    public function printSp(SuratPanggilan $suratPanggilan)
+    {
+        $suratPanggilan->load('santri.kelas');
+        return view('print-sp', compact('suratPanggilan'));
+    }
+}

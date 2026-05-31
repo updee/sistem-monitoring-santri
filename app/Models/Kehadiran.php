@@ -11,7 +11,7 @@ class Kehadiran extends Model
 
     protected $table = 'kehadiran';
     protected $fillable = [
-        'santri_id', 'ustadz_id', 'tanggal', 'sesi', 'status', 'keterangan',
+        'santri_id', 'ustadz_id', 'tanggal', 'sesi_kehadiran_id', 'status', 'keterangan',
     ];
     protected $casts = ['tanggal' => 'date'];
 
@@ -23,6 +23,11 @@ class Kehadiran extends Model
     public function ustadz()
     {
         return $this->belongsTo(User::class, 'ustadz_id');
+    }
+
+    public function sesiKehadiran()
+    {
+        return $this->belongsTo(SesiKehadiran::class, 'sesi_kehadiran_id');
     }
 
     public function getStatusLabelAttribute(): string

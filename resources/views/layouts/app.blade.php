@@ -547,6 +547,7 @@
         .badge-blue { background: #e8f0fe; color: #1a3c8e; }
         .badge-red { background: #fce8e8; color: #c62828; }
         .badge-purple { background: #f0e8fe; color: #6b1e9e; }
+        .badge-teal { background: #e0f7f4; color: #00695c; }
         .badge-gray { background: #f0f0f0; color: #5a5a6a; }
 
         .btn-hijau { background: var(--hijau); color: #fff; border: none; border-radius: 7px; padding: 8px 12px; font-size: 11px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }

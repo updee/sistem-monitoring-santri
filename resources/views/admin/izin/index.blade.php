@@ -21,17 +21,38 @@
 {{-- Filter Tab --}}
 <div class="card-custom mb-4">
     <div class="card-body-custom" style="padding:12px 18px;">
-        <div class="d-flex gap-2 flex-wrap">
-            @foreach(['semua' => 'Semua', 'menunggu' => 'Menunggu', 'disetujui' => 'Disetujui', 'ditolak' => 'Ditolak'] as $val => $label)
-                <a href="{{ route('admin.izin.index', ['status' => $val]) }}"
-                    class="{{ $status === $val ? 'btn-hijau' : 'btn-outline-hijau' }}"
-                    style="padding:6px 14px;font-size:12px;">
-                    {{ $label }}
-                    @if($val === 'menunggu' && $jumlahMenunggu > 0)
-                        <span style="background:{{ $status === 'menunggu' ? 'rgba(255,255,255,0.25)' : 'var(--emas)' }};color:{{ $status === 'menunggu' ? '#fff' : 'var(--hijau)' }};font-size:10px;font-weight:800;padding:1px 6px;border-radius:8px;margin-left:4px;">{{ $jumlahMenunggu }}</span>
-                    @endif
-                </a>
-            @endforeach
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div class="d-flex gap-2 flex-wrap">
+                @foreach(['semua' => 'Semua', 'menunggu' => 'Menunggu', 'disetujui' => 'Disetujui', 'ditolak' => 'Ditolak'] as $val => $label)
+                    <a href="{{ route('admin.izin.index', ['status' => $val, 'bulan' => request('bulan'), 'tahun' => request('tahun')]) }}"
+                        class="{{ $status === $val ? 'btn-hijau' : 'btn-outline-hijau' }}"
+                        style="padding:6px 14px;font-size:12px;">
+                        {{ $label }}
+                        @if($val === 'menunggu' && $jumlahMenunggu > 0)
+                            <span style="background:{{ $status === 'menunggu' ? 'rgba(255,255,255,0.25)' : 'var(--emas)' }};color:{{ $status === 'menunggu' ? '#fff' : 'var(--hijau)' }};font-size:10px;font-weight:800;padding:1px 6px;border-radius:8px;margin-left:4px;">{{ $jumlahMenunggu }}</span>
+                        @endif
+                    </a>
+                @endforeach
+            </div>
+
+            <form method="GET" action="{{ route('admin.izin.index') }}" class="d-flex gap-2 align-items-center">
+                <input type="hidden" name="status" value="{{ $status }}">
+                <select name="bulan" class="form-control-custom" style="width:130px; font-size:12px; padding:6px 12px; height:auto;">
+                    <option value="">Semua Bulan</option>
+                    @for($m=1;$m<=12;$m++)
+                        <option value="{{ $m }}" {{ request('bulan') == $m ? 'selected':'' }}>
+                            {{ \Carbon\Carbon::create(null,$m)->locale('id')->isoFormat('MMMM') }}
+                        </option>
+                    @endfor
+                </select>
+                <select name="tahun" class="form-control-custom" style="width:100px; font-size:12px; padding:6px 12px; height:auto;">
+                    <option value="">Semua Tahun</option>
+                    @for($y=now()->year;$y>=2023;$y--)
+                        <option value="{{ $y }}" {{ request('tahun') == $y ? 'selected':'' }}>{{ $y }}</option>
+                    @endfor
+                </select>
+                <button type="submit" class="btn-hijau" style="padding:6px 14px; font-size:12px;">Filter</button>
+            </form>
         </div>
     </div>
 </div>

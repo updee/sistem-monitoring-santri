@@ -22,7 +22,7 @@ class KategoriPelanggaranController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'nama_kategori' => ['required', 'string', 'max:255'],
+            'nama_kategori' => ['required', 'string', 'max:255', 'unique:kategori_pelanggaran,nama_kategori'],
             'tingkat'       => ['required', 'in:ringan,sedang,berat'],
             'poin_default'  => ['required', 'integer', 'min:0'],
             'deskripsi'     => ['nullable', 'string'],
@@ -47,7 +47,7 @@ class KategoriPelanggaranController extends Controller
     public function update(Request $request, KategoriPelanggaran $kategori_pelanggaran)
     {
         $data = $request->validate([
-            'nama_kategori' => ['required', 'string', 'max:255'],
+            'nama_kategori' => ['required', 'string', 'max:255', 'unique:kategori_pelanggaran,nama_kategori,' . $kategori_pelanggaran->id],
             'tingkat'       => ['required', 'in:ringan,sedang,berat'],
             'poin_default'  => ['required', 'integer', 'min:0'],
             'deskripsi'     => ['nullable', 'string'],

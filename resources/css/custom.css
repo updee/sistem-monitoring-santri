@@ -342,6 +342,7 @@ body {
 .badge-blue    { background: #e8f0fe; color: #1a3c8e; }
 .badge-red     { background: #fce8e8; color: #c62828; }
 .badge-purple  { background: #f0e8fe; color: #6b1e9e; }
+.badge-teal    { background: #e0f7f4; color: #00695c; }
 .badge-gray    { background: #f0f0f0; color: #5a5a6a; }
 
 /* Grade badges */

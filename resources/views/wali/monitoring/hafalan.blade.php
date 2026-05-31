@@ -62,7 +62,7 @@
     <div class="table-responsive wali-hafalan-table-wrap">
         <table class="table-custom">
             <thead>
-                <tr><th>No</th><th>Surat / Juz</th><th>Halaman</th><th>Nilai</th><th>Grade</th><th>Jenis</th><th>Dicatat Oleh</th><th>Tanggal</th><th>Catatan</th></tr>
+                <tr><th>No</th><th>Surat / Juz</th><th>Halaman</th><th>Nilai</th><th>Grade</th><th>Kategori</th><th>Jenis</th><th>Dicatat Oleh</th><th>Tanggal</th><th>Catatan</th></tr>
             </thead>
             <tbody>
                 @forelse($hafalan as $idx => $hf)
@@ -72,13 +72,14 @@
                         <td><span style="font-size:12px;">Hal. {{ $hf->halaman_dari }}–{{ $hf->halaman_sampai }}</span><div class="td-name-sub">{{ $hf->jumlah_halaman }} halaman</div></td>
                         <td style="font-size:14px;font-weight:700;">{{ $hf->nilai ? number_format($hf->nilai,1) : '-' }}</td>
                         <td>@if($hf->grade)<span class="badge-custom grade-{{ strtolower($hf->grade) }}">{{ $hf->grade }}</span>@else<span style="color:var(--txt3);">-</span>@endif</td>
+                        <td>@if($hf->kategori)<span class="badge-custom {{ $hf->kategori_badge_color }}" style="font-size:10px;">{{ $hf->kategori_label }}</span>@else<span style="color:var(--txt3);">-</span>@endif</td>
                         <td><span class="badge-custom {{ $hf->jenis==='setoran_baru' ? 'badge-green':'badge-blue' }}" style="font-size:10px;">{{ $hf->jenis_label }}</span></td>
                         <td style="font-size:12px;">{{ Str::limit($hf->ustadz?->name ?? '-', 18) }}</td>
                         <td style="font-size:12px;color:var(--txt2);">{{ $hf->tanggal_setoran->format('d M Y') }}</td>
                         <td style="font-size:11px;color:var(--txt3);">{{ $hf->catatan ? Str::limit($hf->catatan,30) : '-' }}</td>
                     </tr>
                 @empty
-                    <tr><td colspan="9" class="text-center py-5" style="color:var(--txt3);">Belum ada data setoran hafalan</td></tr>
+                    <tr><td colspan="10" class="text-center py-5" style="color:var(--txt3);">Belum ada data setoran hafalan</td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -88,7 +89,10 @@
             <div class="wali-hafalan-mobile-card">
                 <div class="d-flex align-items-center justify-content-between mb-1">
                     <div class="td-name-main">{{ $hf->nama_surat }}</div>
-                    <span class="badge-custom {{ $hf->jenis==='setoran_baru' ? 'badge-green':'badge-blue' }}" style="font-size:10px;">{{ $hf->jenis_label }}</span>
+                    <div class="d-flex gap-1">
+                        @if($hf->kategori)<span class="badge-custom {{ $hf->kategori_badge_color }}" style="font-size:10px;">{{ $hf->kategori_label }}</span>@endif
+                        <span class="badge-custom {{ $hf->jenis==='setoran_baru' ? 'badge-green':'badge-blue' }}" style="font-size:10px;">{{ $hf->jenis_label }}</span>
+                    </div>
                 </div>
                 <div class="td-name-sub mb-1">Juz {{ $hf->nomor_juz ?? '-' }} · Hal {{ $hf->halaman_dari }}–{{ $hf->halaman_sampai }}</div>
                 <div class="d-flex align-items-center gap-2 mb-1">

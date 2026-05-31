@@ -8,6 +8,8 @@ use App\Models\Kelas;
 use App\Models\Santri;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\SantriImport;
 
 class SantriController extends Controller
 {
@@ -114,6 +116,48 @@ class SantriController extends Controller
     {
         $santri->load(['kelas', 'kamar', 'wali', 'hafalan', 'kehadiran', 'pelanggaran', 'pencapaian', 'izin']);
         return view('admin.santri.rekap', compact('santri'));
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:2048'
+        ]);
+
+        try {
+            Excel::import(new SantriImport, $request->file('file'));
+            return redirect()->back()->with('success', 'Data Santri berhasil diimport. Jangan lupa untuk melengkapi data Kelas, Kamar, dan Wali jika diperlukan.');
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+            $errorMsgs = [];
+            foreach ($failures as $failure) {
+                $errorMsgs[] = "Baris {$failure->row()}: " . implode(', ', $failure->errors());
+            }
+            return redirect()->back()->with('error', 'Gagal import data. Periksa file Excel Anda.<br>' . implode('<br>', $errorMsgs));
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat import: ' . $e->getMessage());
+        }
+    }
+
+    public function downloadTemplate()
+    {
+        // Simple CSV generation for template
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="template_import_santri.csv"',
+        ];
+
+        $callback = function () {
+            $file = fopen('php://output', 'w');
+            // Write headers
+            fputcsv($file, ['nis', 'nama', 'jenis_kelamin', 'tempat_lahir', 'tanggal_lahir', 'no_telepon', 'alamat']);
+            // Write example row
+            fputcsv($file, ['123456', 'Ahmad Santoso', 'L', 'Jakarta', '2005-08-17', '08123456789', 'Jl. Merdeka No. 1']);
+            fputcsv($file, ['123457', 'Siti Aminah', 'P', 'Bandung', '2006-05-12', '08198765432', 'Jl. Asia Afrika']);
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }
 

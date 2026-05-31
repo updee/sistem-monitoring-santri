@@ -23,6 +23,10 @@
         <div class="page-header-sub">Total {{ $santri->total() }} santri terdaftar dalam sistem</div>
     </div>
     <div class="d-flex gap-2">
+        <button type="button" class="btn-outline-hijau" data-bs-toggle="modal" data-bs-target="#importModal">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            Import Excel
+        </button>
         <a href="{{ route('admin.santri.index') }}?export=excel" class="btn-outline-hijau">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             Export Excel
@@ -188,6 +192,43 @@
             @else
                 <span class="page-link" style="opacity:0.4;cursor:not-allowed;">›</span>
             @endif
+        </div>
+    </div>
+</div>
+
+{{-- Modal Import Excel --}}
+<div class="modal fade" id="importModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ route('admin.santri.import') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title" id="importModalLabel" style="font-size: 16px; font-weight: 700; color: var(--hijau);">Import Data Santri</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="font-size: 13px;">
+                    <p class="mb-3">Silakan gunakan template Excel di bawah ini untuk memastikan format data sesuai dengan sistem.</p>
+                    <a href="{{ route('admin.santri.import.template') }}" class="btn-outline-hijau mb-4">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Download Template CSV
+                    </a>
+                    
+                    <div class="form-group-custom">
+                        <label class="form-label-custom">Pilih File Excel / CSV</label>
+                        <input type="file" name="file" class="form-control-custom" accept=".xlsx, .xls, .csv" required style="padding-top: 6px;">
+                        <div class="form-error">Maksimal ukuran file: 2MB. Format: .xlsx, .xls, .csv</div>
+                    </div>
+
+                    <div class="alert-emas mt-3">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                        <div>Data relasi seperti <b>Kelas</b>, <b>Kamar</b>, dan <b>Wali</b> akan dikosongkan. Admin dapat melengkapinya nanti setelah import selesai.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-outline-hijau" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn-hijau">Import Data</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
